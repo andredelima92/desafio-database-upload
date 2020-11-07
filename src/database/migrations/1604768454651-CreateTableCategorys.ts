@@ -25,7 +25,7 @@ export default class CreateTableCategorys1604768454651
           },
           {
             name: 'value',
-            type: 'decimal',
+            type: 'int',
           },
           {
             name: 'type',
