@@ -13,6 +13,8 @@ class TransactionsRepository extends Repository<Transaction> {
   public async getBalance(): Promise<Balance> {
     const transactionRepository = getRepository(Transaction);
 
+    const balance: Balance = { income: 0, outcome: 0, total: 0 };
+
     const incomes = await transactionRepository.find({
       where: { type: 'income' },
     });
@@ -21,17 +23,20 @@ class TransactionsRepository extends Repository<Transaction> {
       where: { type: 'outcome' },
     });
 
-    const incomeTotalValue = incomes
-      .map(income => income.value)
-      .reduce((acc, value) => acc + value);
+    balance.income = incomes.reduce(
+      (acc, income) => (income.type === 'income' ? acc + income.value : acc),
+      0,
+    );
 
-    const outameTotalValue = outcomes
-      .map(outcome => outcome.value)
-      .reduce((acc, value) => acc + value);
+    balance.outcome = outcomes.reduce(
+      (acc, outcome) =>
+        outcome.type === 'outcome' ? acc + outcome.value : acc,
+      0,
+    );
 
-    const total = incomeTotalValue - outameTotalValue;
+    balance.total = balance.income - balance.outcome;
 
-    return { income: incomeTotalValue, outcome: outameTotalValue, total };
+    return balance;
   }
 }
 
